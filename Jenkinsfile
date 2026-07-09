@@ -10,16 +10,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                bat 'docker build -t banking-app .'
+                sh 'docker build -t banking-app .'
             }
         }
         stage('Test') {
             steps {
                 echo 'Running basic health check...'
-                bat 'docker run --rm -d -p 5050:5000 --name banking-app-test banking-app'
-                bat 'timeout /t 5'
-                bat 'curl http://localhost:5050/health'
-                bat 'docker stop banking-app-test'
+                sh 'docker run --rm -d -p 5050:5000 --name banking-app-test banking-app'
+                sh 'timeout /t 5'
+                sh 'curl http://localhost:5050/health'
+                sh 'docker stop banking-app-test'
             }
         }
     }
