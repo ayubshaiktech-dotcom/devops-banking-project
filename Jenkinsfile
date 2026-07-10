@@ -19,7 +19,7 @@ pipeline {
                 sh 'docker rm -f banking-app-test || true'
                 sh 'docker run --rm -d -p 5050:5000 --name banking-app-test banking-app'
                 sh 'sleep 5'
-                sh 'curl http://localhost:5050/health'
+                sh 'curl http://host.docker.internal:5050/health'
                 sh 'docker stop banking-app-test'
             }
         }
