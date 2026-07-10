@@ -16,8 +16,9 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running basic health check...'
+                sh 'docker rm -f banking-app-test || true'
                 sh 'docker run --rm -d -p 5050:5000 --name banking-app-test banking-app'
-                sh 'timeout /t 5'
+                sh 'sleep 5'
                 sh 'curl http://localhost:5050/health'
                 sh 'docker stop banking-app-test'
             }
