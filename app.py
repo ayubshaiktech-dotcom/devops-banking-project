@@ -19,7 +19,7 @@ def health():
 def create_account():
     global next_id
     accounts[next_id] = {"id": next_id, "balance": 0}
-    acc = accounts[next_id]
+    acc = accounts[next_id]app.py
     next_id += 1
     return jsonify(acc), 201
 
