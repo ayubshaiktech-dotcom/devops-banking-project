@@ -19,7 +19,11 @@ pipeline {
                 sh 'docker rm -f banking-app-test || true'
                 sh 'docker run --rm -d -p 5050:5000 --name banking-app-test banking-app'
                 sh 'sleep 5'
-                sh 'curl http://host.docker.internal:5050/health'
+                sh '''
+                  CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' banking-app-test)
+                  echo "Testing container at $CONTAINER_IP"
+                  curl -f http://$CONTAINER_IP:5000/health
+                '''
                 sh 'docker stop banking-app-test'
             }
         }
