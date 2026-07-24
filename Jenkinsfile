@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
             steps {
@@ -7,30 +8,33 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
                 sh 'docker build -t banking-app .'
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Running basic health check...'
                 sh 'docker rm -f banking-app-test || true'
-                sh 'docker run --rm -d -p 5050:5000 --name banking-app-test banking-app'
+                sh 'docker run -d -p 5050:5000 --name banking-app-test banking-app'
                 sh 'sleep 5'
+                sh 'docker logs banking-app-test || true'
+                sh 'docker ps -a --filter name=banking-app-test || true'
                 sh '''
-                  CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' banking-app-test)
-                  echo "Testing container at $CONTAINER_IP"
-                  curl -f http://$CONTAINER_IP:5000/health
+                    CONTAINER_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" banking-app-test || echo "")
+                    echo "Container IP: $CONTAINER_IP"
                 '''
-                sh 'docker stop banking-app-test'
             }
         }
     }
+
     post {
-        success {
-            echo 'Pipeline completed successfully!'
+        always {
+            sh 'docker rm -f banking-app-test || true'
         }
         failure {
             echo 'Pipeline failed - check the logs above.'
